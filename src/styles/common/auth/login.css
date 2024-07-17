@@ -34,6 +34,7 @@
     flex-direction: column;
     align-items: center;
     gap:1.5rem;
+    padding-top: 24px;
 }
 .Name{
     width: 100%;
@@ -92,9 +93,9 @@
   color: #4b4949;
 }
 
-.password-toggle {
+.password-toggle-l {
     position: absolute;
-    top: 50%;
+    top: 35%;
     right: 10px; /* Adjust as needed */
     transform: translateY(-50%);
     cursor: pointer;
@@ -177,7 +178,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap:2.5rem;
     background-color: var(--landing-bg);
 }
 .signup-heading h1{ 
@@ -185,6 +185,7 @@
     font-weight: 600;
     font-size: 28px;
     color: var(--landing-heading-clr);
+    padding-bottom: 24px;
     
 }
 .form{
@@ -218,7 +219,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap:1.5rem;
+    gap:0.2rem;
 }
 .password-input,.confirm-password-input{
     display: flex;
@@ -320,6 +321,39 @@
   .email-holder.error {
     border-color: red;
   }
+
+  .password-strength {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+}
+
+.password-strength .strength-bar {
+    display: flex;
+    flex: 1;
+}
+
+.password-strength .strength-bar div {
+    flex: 1;
+    height: 8px;
+    margin: 0 2px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.password-strength .strength-label {
+    margin-left: 8px;
+    font-weight: bold;
+    color: #4caf50;
+    font-family: var(--p-font);
+    font-size: 12px;
+}
+
+.password-toggle {
+    cursor: pointer;
+}
+
+
   @media only screen and (max-width:600px){
     .signup-heading h1{
         font-size: 24px;

@@ -2,6 +2,7 @@ import '@styles/globals.css';
 import Header from '@components/common/header/header';
 import Footer from '@components/common/footer/Footer';
 import imageO from'../app/opengraph-image.png';
+import { AuthContextProvider } from '@context/AuthContext';
 import { ThemeProvider } from 'next-themes'
 
 export const metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
     
       <body>
+      <AuthContextProvider>
       <ThemeProvider>
         <main className="app">
           <Header />
@@ -36,6 +38,7 @@ export default function RootLayout({ children }) {
           <Footer/>
         </main>
         </ThemeProvider>
+        </AuthContextProvider>
       </body>
     </html>
   )

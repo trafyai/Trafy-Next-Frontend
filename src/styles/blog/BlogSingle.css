@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column;
     gap:5rem;
-    background-color: var(--landing-bg);
+    background-color: #fcfcfc;
 }
 .blog-page-container h1, .blog-page-container p, .blog-page-container h4{
     margin: 0;
@@ -60,7 +60,7 @@ justify-content: center;
 .blog-page-article-socials-description p{
     font-size: 18px;
     font-family: 'Inter',sans-serif;
-    color: var(--landing-para-clr);
+    color: #666464;
     font-weight: 400;
     line-height: 150%;
     margin: 0;
@@ -90,7 +90,7 @@ justify-content: center;
 .blog-page-table-of-contents-container h4{
     font-size: 18px;
     font-family: 'Inter',sans-serif;
-    color: var(--landing-heading-clr);
+    color: #1c1623;
     font-weight: 500;
     line-height: 150%;
     padding-bottom: 6px;
@@ -98,7 +98,7 @@ justify-content: center;
 .blog-page-table-of-contents-container p{
     font-size: 16px;
     font-family: 'Inter',sans-serif;
-    color: var(--landing-para-clr);
+    color: #666464;
     font-weight: 400;
     line-height: 150%;
 }
@@ -123,13 +123,13 @@ justify-content: center;
     align-items: center;
     font-size: 16px;
     font-family: 'Inter',sans-serif;
-    color: var(--landing-para-clr);
+    color: #666464;
     font-weight: 500;
 }
 .blog-page-article-description p{
     font-size: 18px;
     font-family: 'Inter',sans-serif;
-    color: var(--landing-para-clr);
+    color: #666464;
     font-weight: 400;
     line-height: 150%;
 }
@@ -142,14 +142,14 @@ justify-content: center;
 .blog-page-article-main-contents h1{
     font-size: 24px;
     font-family: 'Inter',sans-serif;
-    color: var(--landing-heading-clr);
+    color: #1c1623;
     font-weight: 600;
     line-height: 150%;
 }
 .blog-page-article-main-contents p{
     font-size: 18px;
     font-family: 'Inter',sans-serif;
-    color: var(--landing-para-clr);
+    color:#666464;
     font-weight: 400;
     line-height: 150%;
 }
@@ -179,13 +179,13 @@ justify-content: center;
 .blog-newsletter-form-thankyou h3{
     font-size: 24px;
     font-family: 'Inter',sans-serif;
-    color: var(--landing-heading-clr);
+    color: #1c1623;
     font-weight: 500;
 }
 .blog-newsletter-heading h3{
     font-size: 24px;
     font-family: 'Inter',sans-serif;
-    color: var(--landing-heading-clr);
+    color: #1c1623;
     font-weight: 500;
 }
 .blog-newsletter-form{
@@ -201,6 +201,7 @@ justify-content: center;
 }
 .blog-newsletter-form input{
     border: 1px solid #d4cfcf;
+    background-color: inherit;
     border-radius: 8px;
     width: 80%;
     height: 40px;
@@ -211,17 +212,17 @@ justify-content: center;
     width: max-content;
     height: max-content;
     padding: 8px 16px;
-    border: 2px solid var(--landing-heading-clr);
+    border: 2px solid #1c1623;
     border-radius: 8px;
-    background-color: var(--landing-heading-clr);
-    color: var(--landing-button-t);
+    background-color: #1c1623;
+    color: #f8f8ff;
     font-size: 14px;
     font-weight: 500;
     font-family: 'Inter', sans-serif;
 }
 .blog-newsletter-container-inner button:hover{
     background-color: inherit;
-    color: var(--landing-heading-clr);
+    color: #1c1623;
 }
 .blog-social-b,.blog-social-w{
     display: none;

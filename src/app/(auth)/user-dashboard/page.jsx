@@ -1,10 +1,10 @@
 import React from 'react'
-import UserProfile from '@components/common/auth/user-profile/UserProfile';
+import UserDashboard from '@components/common/auth/user-dashboard/UserDashboard'
 
 const page = () => {
   return (
     <div>
-       <UserProfile/>
+       <UserDashboard/>
     </div>
   )
 }

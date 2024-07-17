@@ -1,4 +1,7 @@
 import LandingHero from '@components/landing-page/LandingHero';
+import LandingCompaniesHired from './LandingCompaniesHired';
+import LandingFeatures from './LandingFeatures';
+import LandingPathway from './LandingPathway';
 import LandingLearning from "@components/landing-page/LandingLearning";
 import LandingExplore from "@components/landing-page/LandingExplore";
 import LandingOptimised from "@components/landing-page/LandingOptimised";
@@ -13,6 +16,9 @@ export default function landingPage(){
         <>
        
         <LandingHero/>
+        {/* <LandingCompaniesHired/> */}
+        <LandingFeatures/>
+        <LandingPathway/>
         <LandingLearning/>
         <LandingExplore/>
         <LandingOptimised/>

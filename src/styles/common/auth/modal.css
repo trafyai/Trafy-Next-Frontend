@@ -1,0 +1,55 @@
+/* styles/common/auth/modal.css */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap:2rem;
+    align-items: center;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+p{
+    color: #1c1623;
+    font-family: var(--p-font);
+    font-size: 16px;
+}
+button{
+padding: 6px 16px;
+border-radius: 6px;
+background-color: #1c1623;
+border: 2px solid #1c1623;
+font-size: 14px;
+font-family: var(--p-font);
+font-weight: 500;
+}
+button:hover{
+    background-color: inherit;
+    color: #1c1623;
+    }

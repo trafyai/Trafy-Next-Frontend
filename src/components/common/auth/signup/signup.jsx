@@ -1,27 +1,21 @@
-'use client';   
+'use client';
 
 import React, { useState } from "react";
 import '@styles/common/auth/login.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/auth';
-import 'firebase/compat/database';
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
+import Modal from '@components/Modal';
+import zxcvbn from 'zxcvbn';
+import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword } from "firebase/auth";
+import { ref, set } from 'firebase/database';
+import { auth, database } from '@firebase'; // Adjust this path based on your actual file structure
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyCqL7lnooyjmNGAOB5nc4yZcb6FKu8e-2A",
-    authDomain: "trafyai-loginsignup.firebaseapp.com",
-    projectId: "trafyai-loginsignup",
-    storageBucket: "trafyai-loginsignup.appspot.com",
-    messagingSenderId: "344792634329",
-    appId: "1:344792634329:web:d343ac2461dd2a731dffc8"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+// Using alias for firebase.js import
+// import { auth, database } from '@/firebase'; 
+// import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+// import { ref, set } from 'firebase/database';
 
 const Signup = () => {
     const [fname, setFname] = useState('');
@@ -29,94 +23,107 @@ const Signup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmpassword, setConfirmPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State to toggle confirm password visibility
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [fnameError, setFnameError] = useState('');
     const [lnameError, setLnameError] = useState('');
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
-    // eslint-disable-next-line
     const [allFieldError, setAllFieldError] = useState('');
-    const router = useRouter();
-    
+    const [firebaseError, setFirebaseError] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [passwordScore, setPasswordScore] = useState(0);
 
-    const handleSumbit = async (e) => {
+    const router = useRouter();
+
+    const validateFname = (value) => {
+        if (!/^[a-zA-Z]*$/.test(value)) {
+            setFnameError("First name should contain only alphabets.");
+        } else {
+            setFnameError('');
+        }
+    };
+
+    const validateLname = (value) => {
+        if (!/^[a-zA-Z]*$/.test(value)) {
+            setLnameError("Last name should contain only alphabets.");
+        } else {
+            setLnameError('');
+        }
+    };
+
+    const validateEmail = (value) => {
+        if (!/^\w+([-]?\w+)@\w+([-]?\w+)(\.\w{2,3})+$/.test(value)) {
+            setEmailError("Please enter a valid email address.");
+        } else {
+            setEmailError('');
+        }
+    };
+
+    const validatePassword = (value) => {
+        if (value.length < 8) {
+            setPasswordError("Password should be at least 8 characters long.");
+        } else {
+            setPasswordError('');
+        }
+    };
+
+    const validateConfirmPassword = (value) => {
+        if (value !== password && value) {
+            setConfirmPasswordError("Passwords do not match.");
+        } else {
+            setConfirmPasswordError('');
+        }
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Reset previous error messages
-        setFnameError('');
-        setLnameError('');
-        setEmailError('');
-        setPasswordError('');
-        setConfirmPasswordError('');
         setAllFieldError('');
+        setFirebaseError('');
 
-        // Form validation
         if (!fname.trim() || !lname.trim() || !email.trim() || !password.trim() || !confirmpassword.trim()) {
             setAllFieldError("Please fill in all fields.");
             return;
         }
 
-        if (!/^[a-zA-Z]*$/.test(fname)) {
-            setFnameError("First name should contain only alphabets.");
-            return;
-        }
-
-        if (!/^[a-zA-Z]*$/.test(lname)) {
-            setLnameError("Last name should contain only alphabets.");
-            return;
-        }
-
-        if (!/^\w+([-]?\w+)@\w+([-]?\w+)(\.\w{2,3})+$/.test(email)) {
-            setEmailError("Please enter a valid email address.");
-            return;
-        }
-
-        if (password.length < 8) {
-            setPasswordError("Password should be at least 8 characters long.");
-            return;
-        }
-
-        if (password !== confirmpassword) {
-            setConfirmPasswordError("Passwords do not match.");
+        if (fnameError || lnameError || emailError || passwordError || confirmPasswordError) {
+            setAllFieldError("Please correct the errors before submitting.");
             return;
         }
 
         try {
-            const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // Store user details in Firebase Realtime Database
-            const databaseRef = firebase.database().ref('usersData');
-            const newUserRef = databaseRef.push();
-            await newUserRef.set({
+            const userRef = ref(database, 'usersData/' + user.uid);
+            await set(userRef, {
                 uid: user.uid,
                 email: user.email,
                 firstName: fname,
                 lastName: lname
             });
 
-            alert("Account Created");
-            router.push('/login');
-        } catch (err) {
-            alert(err.message);
+            router.push('/'); // Correct usage of router.push
+
+        } catch (error) {
+                setFirebaseError('An account with this email already exists. Please log in.');
+                setShowModal(true);
+            console.error(error);
         }
-    }
+    };
 
     const handleGoogleSignIn = async () => {
         try {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            const result = await firebase.auth().signInWithPopup(provider);
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, provider);
             const user = result.user;
 
-            // Extract user's first and last name from the displayName
             const [firstName, ...lastName] = user.displayName.split(' ');
 
-            // Store user details in Firebase Realtime Database
-            const databaseRef = firebase.database().ref('usersData');
-            const newUserRef = databaseRef.push();
-            await newUserRef.set({
+            const userRef = ref(database, 'usersData/' + user.uid);
+            await set(userRef, {
                 uid: user.uid,
                 email: user.email,
                 firstName: firstName,
@@ -124,73 +131,138 @@ const Signup = () => {
             });
 
             alert("Signup with Google Successfully");
-            router.push('/login'); // Redirect to login after successful sign in
+            router.push('/login');
         } catch (err) {
             alert(err.message);
         }
-
-    }
+    };
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
-    }
+    };
 
     const toggleConfirmPasswordVisibility = () => {
         setShowConfirmPassword(!showConfirmPassword);
+    };
+
+    const closeModal = () => {
+        setShowModal(false);
+    };
+
+    const handlePasswordChange = (value) => {
+        setPassword(value);
+        validatePassword(value);
+        setPasswordScore(zxcvbn(value).score);
+    }
+
+    const renderPasswordStrength = (score) => {
+        const strengthLabels = ["Weak", "Fair", "Good", "Strong", "Very Strong"];
+        const segments = 5;
+        const activeSegments = score + 1;
+        const segmentStyle = (index) => ({
+            backgroundColor: index < activeSegments ? '#4caf50' : '#e0e0e0',
+            flex: 1,
+            height: '2px',
+            margin: '0 2px',
+            borderRadius: '4px',
+            transition: 'background-color 0.3s ease'
+        });
+
+        return (
+            <div className="password-strength">
+                <div className="strength-bar">
+                    {Array.from({ length: segments }, (_, index) => (
+                        <div key={index} style={segmentStyle(index)}></div>
+                    ))}
+                </div>
+                <div className="strength-label">
+                    {strengthLabels[score]}
+                </div>
+            </div>
+        );
     }
 
     return (
         <div className="signup">
-            {/* <Helmet>
-        <title>Sign up</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="canonical" href="https://www.trafyai.com/signup" />
-        <meta name="robots" content="noindex" />
-      </Helmet> */}
             <div className="signup-container">
                 <div className="signup-heading"><h1>Create Your Account</h1></div>
-
-                <form className="form" onSubmit={handleSumbit}>
+                {firebaseError && <p style={{ color: "red", paddingBottom: "6px" }}>{firebaseError}</p>}
+                {allFieldError && <div className="error-message">{allFieldError}</div>}
+                <form className="form" onSubmit={handleSubmit}>
                     <div className="Name">
-                        <div className="fname"><input type="text" value={fname} placeholder="Enter first name" autoComplete="off" name="fname"
-                            className="fname-holder" onChange={(e) => setFname(e.target.value)} />
-                        {fnameError && <span className="error-message" style={{width:"100%"}}>{fnameError}</span>}</div>
-                        <div className="lname"><input type="text" value={lname} placeholder="Enter last name" autoComplete="off" name="lname"
-                            className="lname-holder" onChange={(e) => setLname(e.target.value)} />
-                        {lnameError && <span className="error-message">{lnameError}</span>}</div>
+                        <div className="fname">
+                            <input
+                                type="text"
+                                value={fname}
+                                placeholder="Enter first name"
+                                autoComplete="off"
+                                name="fname"
+                                className="fname-holder"
+                                onChange={(e) => { setFname(e.target.value); validateFname(e.target.value); }}
+                                onBlur={(e) => validateFname(e.target.value)}
+                            />
+                            {fnameError && <span className="error-message" style={{ width: "100%" }}>{fnameError}</span>}
+                        </div>
+                        <div className="lname">
+                            <input
+                                type="text"
+                                value={lname}
+                                placeholder="Enter last name"
+                                autoComplete="off"
+                                name="lname"
+                                className="lname-holder"
+                                onChange={(e) => { setLname(e.target.value); validateLname(e.target.value); }}
+                                onBlur={(e) => validateLname(e.target.value)}
+                            />
+                            {lnameError && <span className="error-message">{lnameError}</span>}
+                        </div>
                     </div>
                     <div className="Email">
-                        <input type="text" value={email} placeholder="Enter email" required autoComplete="off" name="email"
-                            className="email-holder" onChange={(e) => setEmail(e.target.value)} />
+                        <input
+                            type="text"
+                            value={email}
+                            placeholder="Enter email"
+                            required
+                            autoComplete="off"
+                            name="email"
+                            className="email-holder"
+                            onChange={(e) => { setEmail(e.target.value); validateEmail(e.target.value); }}
+                            onBlur={(e) => validateEmail(e.target.value)}
+                        />
                         {emailError && <span className="error-message">{emailError}</span>}
                     </div>
                     <div className="Password">
                         <div className="password-input">
-                            <input 
-                                type={showPassword ? "text" : "password"} // Toggle input type based on showPassword state
-                                value={password} 
-                                placeholder="Enter password" 
-                                required autoComplete="off"
-                                name="password" 
-                                className="password-holder" 
-                                onChange={(e) => setPassword(e.target.value)} 
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                value={password}
+                                placeholder="Enter password"
+                                required
+                                autoComplete="off"
+                                name="password"
+                                className="password-holder"
+                                onChange={(e) => { handlePasswordChange(e.target.value); }}
+                                onBlur={(e) => validatePassword(e.target.value)}
                             />
                             <span className="password-toggle" onClick={togglePasswordVisibility}>
                                 <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                             </span>
                         </div>
                         {passwordError && <span className="error-message">{passwordError}</span>}
+                        {password && renderPasswordStrength(passwordScore)}
                     </div>
                     <div className="Password">
                         <div className="confirm-password-input">
-                            <input 
-                                type={showConfirmPassword ? "text" : "password"} // Toggle input type based on showConfirmPassword state
-                                value={confirmpassword} 
-                                placeholder="Confirm password" 
-                                required autoComplete="off"
-                                name="confirmpassword" 
-                                className="password-holder" 
-                                onChange={(e) => setConfirmPassword(e.target.value)} 
+                            <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                value={confirmpassword}
+                                placeholder="Confirm password"
+                                required
+                                autoComplete="off"
+                                name="confirmpassword"
+                                className="password-holder"
+                                onChange={(e) => { setConfirmPassword(e.target.value); validateConfirmPassword(e.target.value); }}
+                                onBlur={(e) => validateConfirmPassword(e.target.value)}
                             />
                             <span className="password-toggle" onClick={toggleConfirmPasswordVisibility}>
                                 <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
@@ -205,9 +277,10 @@ const Signup = () => {
                     <div className="divider"></div>
 
                     <div className="google-signin">
-                     <button type="button" className="login-with-google-btn" onClick={handleGoogleSignIn}>Sign up with Google</button>
+                        <button type="button" className="login-with-google-btn" onClick={handleGoogleSignIn}>Sign up with Google</button>
                     </div>
-                    
+                    <p style={{fontSize:"12px",lineHeight:"150%"}}>By signing up, you agree to our <Link href="/terms-of-service">Terms of services</Link> and <Link href="/privacy-policy">Privacy Policy</Link>.</p>
+
                     <p>Already have an account? <Link href="/login"> Login</Link> </p>
                 </form>
             </div>
